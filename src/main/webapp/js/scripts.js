@@ -31,7 +31,6 @@ $(document).ready(function() {
     function getData(endpoint, callback) {
         var request = $.ajax({ 
             type: "GET",
-            dataType: "json",
             url:  url + endpoint,
             data: {}
          });
@@ -48,9 +47,7 @@ $(document).ready(function() {
     function generateNewData(endpoint, callback) {
         var request = $.ajax({ 
             type: "POST",
-            dataType: "json",
-            url:  url + endpoint,
-            data: {}
+            url:  url + endpoint
          });
 
         request.success(function(data, status, jqXHR) {

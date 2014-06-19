@@ -14,6 +14,9 @@
  */
 package org.sakaiproject.oaai.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -86,6 +89,14 @@ public class OaaiService {
             sb.append(array[i]);
         }
         return sb.toString();
+    }
+
+    public String createDatedDirectoryName() {
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd_kkmmss");
+        String directoryName = sdf.format(date);
+
+        return directoryName;
     }
 
     private AuthzGroupService authzGroupService;

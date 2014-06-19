@@ -16,4 +16,34 @@ package org.sakaiproject.oaai.dao;
 
 public class Queries {
 
+    public String getSqlEvents() {
+        String sql = "SELECT " +
+                "ss.TITLE," +
+                "sn.SESSION_USER," +
+                "sn.SESSION_START," +
+                "sn.SESSION_END," +
+                "se.EVENT_ID," +
+                "se.EVENT_DATE," +
+                "se.EVENT," +
+                "se.REF," +
+                "COALESCE(" +
+                    "se.CONTEXT," +
+                    "SUBSTR(se.REF, LOCATE('/',se.REF, 2) + 1, INSTR(se.REF,'-p') - LOCATE('/',se.REF, 2) - 1)" +
+                ") CONTEXT," +
+                "se.SESSION_ID," +
+                "se.EVENT_CODE " +
+            "FROM " +
+                "SAKAI_EVENT se " +
+            "LEFT JOIN " +
+                "SAKAI_SESSION sn " +
+                    "ON se.SESSION_ID = sn.SESSION_ID " +
+            "LEFT JOIN " +
+                "SAKAI_SITE ss " +
+                    "ON se.CONTEXT = ss.SITE_ID " +
+            "WHERE " +
+                "ss.TITLE LIKE ?";
+
+        return sql;
+    }
+
 }

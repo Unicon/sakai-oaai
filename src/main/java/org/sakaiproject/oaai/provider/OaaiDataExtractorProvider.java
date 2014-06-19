@@ -25,9 +25,8 @@ import org.sakaiproject.entitybroker.entityprovider.capabilities.Describeable;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.Outputable;
 import org.sakaiproject.entitybroker.entityprovider.extension.ActionReturn;
 import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
-import org.sakaiproject.entitybroker.exception.EntityNotFoundException;
 import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
-import org.sakaiproject.oaai.dao.DbService;
+import org.sakaiproject.oaai.dao.Data;
 import org.sakaiproject.oaai.service.OaaiService;
 
 /**
@@ -106,7 +105,7 @@ public class OaaiDataExtractorProvider extends AbstractEntityProvider implements
             throw new SecurityException("User not allowed to access usage .csv.", null);
         }
 
-        return new ActionReturn(ENCODING_UTF8, Formats.JSON, "{\"usage\": \"usage1\"}");
+        return new ActionReturn(ENCODING_UTF8, Formats.JSON, "{}");
     }
 
     /**
@@ -121,7 +120,16 @@ public class OaaiDataExtractorProvider extends AbstractEntityProvider implements
             throw new SecurityException("User not allowed to generate new CSVs.", null);
         }
 
-        return new ActionReturn(ENCODING_UTF8, Formats.JSON, "{\"generate\": \"generated1\"}");
+        String searchTerm = view.getPathSegment(2);
+        if (searchTerm == null) {
+            searchTerm = "";
+        }
+
+        String directory = oaaiService.createDatedDirectoryName();
+
+        boolean usageCsvCreated = data.prepareUsageCsv(searchTerm, directory);
+
+        return new ActionReturn(ENCODING_UTF8, Formats.TXT, "Usage CSV created successfully: " + Boolean.toString(usageCsvCreated));
     }
 
     public String[] getHandledOutputFormats() {
@@ -137,8 +145,8 @@ public class OaaiDataExtractorProvider extends AbstractEntityProvider implements
         this.oaaiService = oaaiService;
     }
 
-    private DbService dbService;
-    public void setDbService(DbService dbService) {
-        this.dbService = dbService;
+    private Data data;
+    public void setData(Data data) {
+        this.data = data;
     }
 }
