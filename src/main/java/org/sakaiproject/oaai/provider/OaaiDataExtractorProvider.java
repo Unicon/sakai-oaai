@@ -15,9 +15,9 @@
 
 package org.sakaiproject.oaai.provider;
 
-import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.sakaiproject.entitybroker.EntityView;
 import org.sakaiproject.entitybroker.entityprovider.EntityProvider;
 import org.sakaiproject.entitybroker.entityprovider.annotations.EntityCustomAction;
@@ -28,6 +28,7 @@ import org.sakaiproject.entitybroker.entityprovider.extension.ActionReturn;
 import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
 import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
 import org.sakaiproject.oaai.dao.Data;
+import org.sakaiproject.oaai.service.FileService;
 import org.sakaiproject.oaai.service.OaaiService;
 
 /**
@@ -43,7 +44,6 @@ public class OaaiDataExtractorProvider extends AbstractEntityProvider implements
     }
 
     private static String ENCODING_UTF8 = "UTF-8";
-    private static String MIMETYPE_CSV = "text/csv";
     
     public void init() {
         log.info("INIT Sakai OAAI Data Extractor");
@@ -106,7 +106,7 @@ public class OaaiDataExtractorProvider extends AbstractEntityProvider implements
             throw new SecurityException("User not allowed to access usage .csv.", null);
         }
 
-        return new ActionReturn(ENCODING_UTF8, Formats.TXT, "");
+        return new ActionReturn(ENCODING_UTF8, Formats.JSON, "{\"usage\":\"usage1\"}");
     }
 
     /**
@@ -126,7 +126,7 @@ public class OaaiDataExtractorProvider extends AbstractEntityProvider implements
             searchTerm = "";
         }
 
-        String directory = oaaiService.createDatedDirectoryName();
+        String directory = fileService.createDatedDirectoryName();
 
         boolean usageCsvCreated = data.prepareUsageCsv(searchTerm, directory);
 
@@ -150,4 +150,10 @@ public class OaaiDataExtractorProvider extends AbstractEntityProvider implements
     public void setData(Data data) {
         this.data = data;
     }
+
+    private FileService fileService;
+    public void setFileService(FileService fileService) {
+        this.fileService = fileService;
+    }
+
 }

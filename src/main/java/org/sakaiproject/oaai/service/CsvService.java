@@ -35,6 +35,7 @@ public class CsvService {
             csvRow = sb.toString();
             // remove last comma
             csvRow = csvRow.substring(0, csvRow.length() - 1);
+            // add line break
             csvRow += "\n";
         }
 
@@ -48,6 +49,8 @@ public class CsvService {
         } else {
             sb.append(toQuote);
         }
+
         return sb;
     }
+
 }

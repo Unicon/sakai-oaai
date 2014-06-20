@@ -33,9 +33,9 @@
     <legend class="formLegend">Download a data report</legend>
     <form id="downloadForm" method="post" action="download.htm">
         <div class="selectDateRange">
-            <select id="csvDirectory" name="csvDirectory" class="form-control">
-                <c:forEach var="csvDirectory" items="${csvDirectories}">
-                    <option value="${csvDirectory.key}">${csvDirectory.value}</option>
+            <select id="directory" name="directory" class="form-control">
+                <c:forEach var="directory" items="${directories}">
+                    <option value="${directory.key}">${directory.value}</option>
                 </c:forEach>
             </select>
         </div>
@@ -54,16 +54,7 @@
         <button class="btn btn-danger" id="generate"><spring:message code="oaai.button.generate" /></button>
     </div>
 </fieldset>
-<div id="jsonResponse"></div>
 
 </div>
-
-<!-- Hidden block to declare resource bundle variables for use in JS -->
-<div style="display: none;">
-  <!-- By convention, the id of the span must be "i18n_"+{message code}, the container div should be set to display:none;, use kaltura.i18n(key) in JS to lookup the message -->
-  <%-- <span id="i18n_listCollections.delete.collection.confirmation"><spring:message code="listCollections.delete.collection.confirmation" /></span> --%>
-</div>
-
-<!-- script type="text/javascript"></script -->
 
 <jsp:directive.include file="/WEB-INF/jsp/footer.jsp" />

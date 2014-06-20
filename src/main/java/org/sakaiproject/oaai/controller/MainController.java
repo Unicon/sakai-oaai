@@ -21,7 +21,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.oaai.dao.Data;
@@ -37,8 +36,8 @@ public class MainController extends AbstractController {
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String,Object> model = new HashMap<String,Object>();
 
-        Map<String, String> csvDirectoryListing = data.getDirectoryListing();
-        model.put("csvDirectories", csvDirectoryListing);
+        Map<String, String> directoryListing = data.getDirectoryListing();
+        model.put("directories", directoryListing);
 
         return new ModelAndView("main", model);
     }

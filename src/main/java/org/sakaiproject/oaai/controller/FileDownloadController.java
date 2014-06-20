@@ -14,7 +14,6 @@
  */
 package org.sakaiproject.oaai.controller;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.oaai.Constants;
 import org.sakaiproject.oaai.dao.Data;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,14 +31,14 @@ public class FileDownloadController {
     private final Log log = LogFactory.getLog(FileDownloadController.class);
 
     @RequestMapping(method = RequestMethod.POST)
-    public void doDownload(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doDownload(HttpServletRequest request, HttpServletResponse response) {
         String datedDirectory = request.getParameter("csvDirectory");
         String action = request.getParameter("action");
+        String fileName = action + ".csv";
+        String csvData = data.getCsvData(datedDirectory, action);
 
-        String csvData = data.getCsvFile(datedDirectory, action);
-
-        response.setContentType("text/csv");
-        response.setHeader("Content-Disposition", "attachment; filename='"+ action + ".csv'");
+        response.setContentType(Constants.MIME_TYPE_CSV);
+        response.setHeader("Content-Disposition", "attachment; filename='"+ fileName + "'");
         try {
             OutputStream outputStream = response.getOutputStream();
             outputStream.write(csvData.getBytes());

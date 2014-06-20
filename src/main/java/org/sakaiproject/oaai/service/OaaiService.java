@@ -14,29 +14,25 @@
  */
 package org.sakaiproject.oaai.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sakaiproject.authz.api.AuthzGroupService;
+
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.user.api.UserDirectoryService;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 
 /**
- * Handles the processing related to the permissions handler
  * 
  * @author Robert E. Long (rlong @ unicon.net)
  */
 public class OaaiService {
 
-    final protected Log log = LogFactory.getLog(getClass());
+    final protected Log log = LogFactory.getLog(OaaiService.class);
 
     public boolean isAdminSession() {
         String sessionId = sessionManager.getCurrentSession().getId();
@@ -78,31 +74,6 @@ public class OaaiService {
             msg = "Missing message for code: "+code;
         }
         return msg;
-    }
-
-
-    public static String makeStringFromArray(String[] array) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < array.length; i++) {
-            if (i > 0) {
-                sb.append(", ");
-            }
-            sb.append(array[i]);
-        }
-        return sb.toString();
-    }
-
-    public String createDatedDirectoryName() {
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH);
-        String directoryName = sdf.format(date);
-
-        return directoryName;
-    }
-
-    private AuthzGroupService authzGroupService;
-    public void setAuthzGroupService(AuthzGroupService authzGroupService) {
-        this.authzGroupService = authzGroupService;
     }
 
     private SessionManager sessionManager;

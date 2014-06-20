@@ -12,24 +12,17 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+package org.sakaiproject.oaai;
 
-.generateButton, .selectDateRange {
-    margin: 0 0 2em 0;
-}
+public class Constants {
 
-.selectDateRange .form-control {
-    width: auto;
-}
+    public final static String CSV_FILE_COURSES = "courses.csv";
+    public final static String CSV_FILE_GRADES = "grades.csv";
+    public final static String CSV_FILE_STUDENTS = "students.csv";
+    public final static String CSV_FILE_USAGE = "usage.csv";
 
-.formFieldset {
-    width: 90%;
-    border: 3px solid #666;
-    margin: 20px auto;
-    padding: 20px;
-}
+    public final static String DATE_FORMAT_FILE_NAME = "yyyyMMdd_HHmmss";
+    public final static String DATE_FORMAT_DROPDOWN = "MMMM dd, yyyy HH:mm:ss";
 
-.formLegend {
-    border: none;
-    width: auto;
-    padding: 5px;
+    public final static String MIME_TYPE_CSV = "text/csv";
 }

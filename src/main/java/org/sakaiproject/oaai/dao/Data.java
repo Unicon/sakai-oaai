@@ -14,32 +14,27 @@
  */
 package org.sakaiproject.oaai.dao;
 
-import java.io.File;
-import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.sakaiproject.oaai.Constants;
 import org.sakaiproject.oaai.service.CsvService;
 import org.sakaiproject.oaai.service.FileService;
 
 public class Data extends Db {
 
     private final Log log = LogFactory.getLog(Data.class);
-
-    private static String CSV_FILE_USAGE = "usage.csv";
 
     /**
      * Create the usage.csv file, store it on file system
@@ -70,6 +65,7 @@ public class Data extends Db {
             }
             csvData += csvService.setAsCsvRow(header);
 
+            // data rows
             while (results.next()) {
                 List<String> row = new ArrayList<String>();
                 for (int i = 1;i <=numberOfColumns;i++) {
@@ -78,7 +74,7 @@ public class Data extends Db {
                 csvData += csvService.setAsCsvRow(row);
             }
 
-            success = saveCsvFile(csvData, directory, CSV_FILE_USAGE);
+            success = fileService.saveStringToFile(csvData, directory, Constants.CSV_FILE_USAGE);
         } catch (Exception e) {
             log.error("Error preparing usage csv: " + e, e);
         } finally {
@@ -88,38 +84,30 @@ public class Data extends Db {
         return success;
     }
 
-    private boolean saveCsvFile(String csvData, String directory, String name) {
-        File csvFile = fileService.createNewFile(directory, name);
-        boolean success = fileService.writeToCsvFile(csvFile, csvData);
-
-        return success;
-    }
-
-    public String getCsvFile(String datedDirectory, String fileName) {
-        fileName += ".csv";
+    public String getCsvData(String datedDirectory, String fileName) {
         String csvData = fileService.readFileIntoString(datedDirectory, fileName);
 
         return csvData;
     }
 
     public Map<String, String> getDirectoryListing() {
-        List<String> csvDirectoryNames = fileService.parseCsvDirectory();
-        Map<String, String> csvDirectories = new HashMap<String, String>(csvDirectoryNames.size());
-        SimpleDateFormat fileDate = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH);
-        SimpleDateFormat humanDate = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss", Locale.ENGLISH);
+        List<String> directoryNames = fileService.parseDirectory();
+        Map<String, String> directories = new HashMap<String, String>(directoryNames.size());
+        SimpleDateFormat fileNameDateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_FILE_NAME, Locale.ENGLISH);
+        SimpleDateFormat dropdownDateFormat = new SimpleDateFormat(Constants.DATE_FORMAT_DROPDOWN, Locale.ENGLISH);
 
-        for (String csvDirectoryName : csvDirectoryNames) {
+        for (String directoryName : directoryNames) {
             try {
-                Date date = fileDate.parse(csvDirectoryName);
-                String formattedDate = humanDate.format(date);
-                csvDirectories.put(csvDirectoryName, formattedDate);
+                Date date = fileNameDateFormat.parse(directoryName);
+                String formattedDate = dropdownDateFormat.format(date);
+                directories.put(directoryName, formattedDate);
             } catch (Exception e) {
                 log.error("Error parsing directory name: " + e, e);
-                csvDirectories.put(csvDirectoryName, csvDirectoryName);
+                directories.put(directoryName, directoryName);
             }
         }
 
-        return csvDirectories;
+        return directories;
     }
 
     private CsvService csvService;

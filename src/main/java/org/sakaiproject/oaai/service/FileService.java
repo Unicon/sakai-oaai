@@ -20,8 +20,11 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NullArgumentException;
@@ -29,43 +32,40 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.component.cover.ServerConfigurationService;
+import org.sakaiproject.oaai.Constants;
 
 public class FileService {
 
     private final Log log = LogFactory.getLog(FileService.class);
 
     private static String DEFAULT_CSV_STORAGE_DIRECTORY = "oaai/";
+    private String storagePath = "";
 
-    private String createCsvStoragePath() {
-        String rootDirectory = ServerConfigurationService.getString("bodyPath@org.sakaiproject.content.api.ContentHostingService", "");
-        rootDirectory = addTrailingSlash(rootDirectory);
-
-        String csvDirectory = ServerConfigurationService.getString("oaai.storage.directory", DEFAULT_CSV_STORAGE_DIRECTORY);
-        csvDirectory = addTrailingSlash(csvDirectory);
-
-        return rootDirectory + csvDirectory;
+    public void init() {
+        storagePath = createStoragePath();
+        // create the root directory
+        createNewDirectory("");
     }
 
-    private void createNewRootDirectory() {
-        File newDirectory = new File(createCsvStoragePath());
+    /**
+     * Creates a string representing the path to the storage directory
+     * @return the path string
+     */
+    private String createStoragePath() {
+        String storagePath = ServerConfigurationService.getString("oaai.storage.path", "");
+        if (StringUtils.isBlank(storagePath)) {
+            String rootDirectory = ServerConfigurationService.getString("bodyPath@org.sakaiproject.content.api.ContentHostingService", "");
+            rootDirectory = addTrailingSlash(rootDirectory);
 
-        createDirectory(newDirectory);
+            storagePath = addTrailingSlash(rootDirectory + DEFAULT_CSV_STORAGE_DIRECTORY);
+        }
+
+        return storagePath;
     }
 
-    private String createNewCsvDirectory(String directoryName) {
-        // create root directory, if needed
-        createNewRootDirectory();
+    private String createNewDirectory(String directoryName) {
+        File newDirectory = new File(storagePath + directoryName);
 
-        File newDirectory = new File(createCsvStoragePath() + directoryName);
-
-        createDirectory(newDirectory);
-
-        String path = newDirectory.getPath();
-
-        return path;
-    }
-
-    private void createDirectory(File newDirectory) {
         // if the directory does not exist, create it
         if (!newDirectory.exists()) {
             try{
@@ -74,56 +74,68 @@ public class FileService {
                 log.error("Cannot create new directory: " + e, e);
             }
         }
+
+        String path = newDirectory.getPath();
+
+        return path;
     }
 
-    public File createNewFile(String datedDirectory, String name) {
+    public String createDatedDirectoryName() {
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_FILE_NAME, Locale.ENGLISH);
+        String directoryName = sdf.format(date);
+
+        return directoryName;
+    }
+
+    public File createNewFile(String datedDirectory, String fileName) {
         if (StringUtils.isBlank(datedDirectory)) {
             throw new NullArgumentException("File directory cannot be null or blank");
         }
-        if (StringUtils.isBlank(name)) {
+        if (StringUtils.isBlank(fileName)) {
             throw new NullArgumentException("File name cannot be null or blank");
         }
 
         File newFile = null;
 
-        String csvDirectory = createNewCsvDirectory(datedDirectory);
-        csvDirectory = addTrailingSlash(csvDirectory);
+        String directory = createNewDirectory(datedDirectory);
+        directory = addTrailingSlash(directory);
 
         try {
-            newFile = new File(csvDirectory + name);
+            newFile = new File(directory + fileName);
             newFile.createNewFile();
         } catch (Exception e) {
-            log.error("Error creating file: " + e, e);
+            log.error("Error creating new file: " + e, e);
         }
 
         return newFile;
     }
 
-    public boolean writeToCsvFile(File csvFile, String csvData) {
+    public boolean writeStringToFile(File file, String dataString) {
         try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(csvFile.getAbsoluteFile()));
-            bufferedWriter.write(csvData);
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
+            bufferedWriter.write(dataString);
             bufferedWriter.close();
 
             return true;
         } catch (Exception e) {
-            log.error("Error writing to CSV file: " + e, e);
+            log.error("Error writing string to file: " + e, e);
 
             return false;
         }
     }
 
-    public List<String> parseCsvDirectory() {
-        List<String> csvFolders = new ArrayList<String>();
-        File csvDirectory = new File(createCsvStoragePath());
+    public List<String> parseDirectory() {
+        List<String> folders = new ArrayList<String>();
+        File directory = new File(storagePath);
 
-        for (File subDirectory : csvDirectory.listFiles()) {
+        for (File subDirectory : directory.listFiles()) {
             if (subDirectory.isDirectory()) {
-                csvFolders.add(subDirectory.getName());
+                folders.add(subDirectory.getName());
             }
         }
 
-        return csvFolders;
+        return folders;
     }
 
     public File getFile(String datedDirectory, String fileName) {
@@ -136,7 +148,7 @@ public class FileService {
 
         datedDirectory = addTrailingSlash(datedDirectory);
 
-        File file = new File(createCsvStoragePath() + datedDirectory + fileName);
+        File file = new File(storagePath + datedDirectory + fileName);
 
         return file;
     }
@@ -156,6 +168,13 @@ public class FileService {
         }
 
         return fileString;
+    }
+
+    public boolean saveStringToFile(String dataString, String directory, String name) {
+        File file = createNewFile(directory, name);
+        boolean success = writeStringToFile(file, dataString);
+
+        return success;
     }
 
     private String addTrailingSlash(String path) {

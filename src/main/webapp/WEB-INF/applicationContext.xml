@@ -36,19 +36,19 @@
         <property name="sqlService" ref="org.sakaiproject.db.api.SqlService" />
     </bean>
 
-    <bean id="fileService" class="org.sakaiproject.oaai.service.FileService"></bean>
+    <bean id="fileService" class="org.sakaiproject.oaai.service.FileService" init-method="init"></bean>
 
     <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" class="org.sakaiproject.oaai.provider.OaaiDataExtractorProvider">
         <property name="data" ref="data" />
+        <property name="fileService" ref="fileService" />
         <property name="oaaiService" ref="oaaiService" />
     </bean>
 
     <bean id="oaaiService" class="org.sakaiproject.oaai.service.OaaiService">
-        <property name="authzGroupService" ref="org.sakaiproject.authz.api.AuthzGroupService" />
+        <property name="messageSource" ref="messageSource" />
         <property name="securityService" ref="org.sakaiproject.authz.api.SecurityService" />
         <property name="sessionManager" ref="org.sakaiproject.tool.api.SessionManager" />
         <property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService" />
-        <property name="messageSource" ref="messageSource" />
     </bean>
 
 </beans>
