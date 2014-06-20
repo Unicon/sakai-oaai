@@ -18,20 +18,10 @@ public class Queries {
 
     public String getSqlEvents() {
         String sql = "SELECT " +
-                "ss.TITLE," +
-                "sn.SESSION_USER," +
-                "sn.SESSION_START," +
-                "sn.SESSION_END," +
-                "se.EVENT_ID," +
-                "se.EVENT_DATE," +
-                "se.EVENT," +
-                "se.REF," +
-                "COALESCE(" +
-                    "se.CONTEXT," +
-                    "SUBSTR(se.REF, LOCATE('/',se.REF, 2) + 1, INSTR(se.REF,'-p') - LOCATE('/',se.REF, 2) - 1)" +
-                ") CONTEXT," +
-                "se.SESSION_ID," +
-                "se.EVENT_CODE " +
+                "se.EVENT_ID ALTERNATIVE_ID," +
+                "ss.SITE_ID COURSE_ID," +
+                "se.EVENT EVENT," +
+                "se.EVENT_DATE EVENT_DATE " +
             "FROM " +
                 "SAKAI_EVENT se " +
             "LEFT JOIN " +

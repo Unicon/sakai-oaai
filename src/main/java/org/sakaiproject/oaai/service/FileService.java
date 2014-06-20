@@ -16,9 +16,14 @@ package org.sakaiproject.oaai.service;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -31,72 +36,44 @@ public class FileService {
 
     private static String DEFAULT_CSV_STORAGE_DIRECTORY = "oaai/";
 
-    private String getRootStorageDirectory() {
-        String rootDir = ServerConfigurationService.getString("bodyPath@org.sakaiproject.content.api.ContentHostingService", "");
-        rootDir = addTrailingSlash(rootDir);
-
-        return rootDir;
-    }
-
-    private String getCsvStorageDirectory() {
-        String csvDir = ServerConfigurationService.getString("oaai.storage.directory", DEFAULT_CSV_STORAGE_DIRECTORY);
-        csvDir = addTrailingSlash(csvDir);
-
-        return csvDir;
-    }
-
     private String createCsvStoragePath() {
-        String rootDirectory = getRootStorageDirectory();
-        String csvDirectory = getCsvStorageDirectory();
+        String rootDirectory = ServerConfigurationService.getString("bodyPath@org.sakaiproject.content.api.ContentHostingService", "");
+        rootDirectory = addTrailingSlash(rootDirectory);
+
+        String csvDirectory = ServerConfigurationService.getString("oaai.storage.directory", DEFAULT_CSV_STORAGE_DIRECTORY);
+        csvDirectory = addTrailingSlash(csvDirectory);
 
         return rootDirectory + csvDirectory;
     }
 
     private void createNewRootDirectory() {
-        File theDir = new File(createCsvStoragePath());
+        File newDirectory = new File(createCsvStoragePath());
 
-        // if the directory does not exist, create it
-        if (!theDir.exists()) {
-            try{
-                theDir.mkdir();
-            } catch(Exception e){
-                log.error("Cannot create new directory: " + e, e);
-            }
-        }
+        createDirectory(newDirectory);
     }
 
-    /**
-     * Creates a new directory with the current date and time as the name
-     * @return the path to the directory
-     */
-    public String createNewCsvDirectory() {
-        String directoryName = oaaiService.createDatedDirectoryName();
-        return createNewCsvDirectory(directoryName);
-    }
-
-    public String createNewCsvDirectory(String directoryName) {
+    private String createNewCsvDirectory(String directoryName) {
+        // create root directory, if needed
         createNewRootDirectory();
 
-        File theDir = new File(createCsvStoragePath() + directoryName);
+        File newDirectory = new File(createCsvStoragePath() + directoryName);
 
-        // if the directory does not exist, create it
-        if (!theDir.exists()) {
-            try{
-                theDir.mkdir();
-            } catch(Exception e){
-                log.error("Cannot create new directory: " + e, e);
-            }
-        }
+        createDirectory(newDirectory);
 
-        String path = theDir.getPath();
+        String path = newDirectory.getPath();
 
         return path;
     }
 
-    public File createNewFile(String name) {
-        String directory = createNewCsvDirectory();
-
-        return createNewFile(directory, name);
+    private void createDirectory(File newDirectory) {
+        // if the directory does not exist, create it
+        if (!newDirectory.exists()) {
+            try{
+                newDirectory.mkdir();
+            } catch(Exception e){
+                log.error("Cannot create new directory: " + e, e);
+            }
+        }
     }
 
     public File createNewFile(String datedDirectory, String name) {
@@ -136,17 +113,57 @@ public class FileService {
         }
     }
 
+    public List<String> parseCsvDirectory() {
+        List<String> csvFolders = new ArrayList<String>();
+        File csvDirectory = new File(createCsvStoragePath());
+
+        for (File subDirectory : csvDirectory.listFiles()) {
+            if (subDirectory.isDirectory()) {
+                csvFolders.add(subDirectory.getName());
+            }
+        }
+
+        return csvFolders;
+    }
+
+    public File getFile(String datedDirectory, String fileName) {
+        if (StringUtils.isBlank(datedDirectory)) {
+            throw new NullArgumentException("File directory cannot be null or blank");
+        }
+        if (StringUtils.isBlank(fileName)) {
+            throw new NullArgumentException("File name cannot be null or blank");
+        }
+
+        datedDirectory = addTrailingSlash(datedDirectory);
+
+        File file = new File(createCsvStoragePath() + datedDirectory + fileName);
+
+        return file;
+    }
+
+    public String readFileIntoString(String datedDirectory, String fileName) {
+        String fileString = "";
+
+        try {
+            File file = getFile(datedDirectory, fileName);
+
+            InputStream inputStream = new FileInputStream(file);
+            StringWriter writer = new StringWriter();
+            IOUtils.copy(inputStream, writer);
+            fileString = writer.toString();
+        } catch (Exception e) {
+            log.error("Error reading file into string: " + e, e);
+        }
+
+        return fileString;
+    }
+
     private String addTrailingSlash(String path) {
         if (!StringUtils.endsWith(path, "/")) {
             path += "/";
         }
 
         return path;
-    }
-
-    private OaaiService oaaiService;
-    public void setOaaiService(OaaiService oaaiService) {
-        this.oaaiService = oaaiService;
     }
 
 }

@@ -36,9 +36,7 @@
         <property name="sqlService" ref="org.sakaiproject.db.api.SqlService" />
     </bean>
 
-    <bean id="fileService" class="org.sakaiproject.oaai.service.FileService">
-        <property name="oaaiService" ref="oaaiService" />
-    </bean>
+    <bean id="fileService" class="org.sakaiproject.oaai.service.FileService"></bean>
 
     <bean parent="org.sakaiproject.entitybroker.entityprovider.AbstractEntityProvider" class="org.sakaiproject.oaai.provider.OaaiDataExtractorProvider">
         <property name="data" ref="data" />

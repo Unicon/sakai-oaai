@@ -13,8 +13,12 @@
  * permissions and limitations under the License.
  */
 
-.generateButton {
-    margin: 2em 0;
+.generateButton, .selectDateRange {
+    margin: 0 0 2em 0;
+}
+
+.selectDateRange .form-control {
+    width: auto;
 }
 
 #jsonResponse {
@@ -22,4 +26,17 @@
     margin: 2em auto;
     padding: 1em;
     border: 2px solid #aaa;
+}
+
+.formFieldset {
+    width: 90%;
+    border: 3px solid #666;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.formLegend {
+    border: none;
+    width: auto;
+    padding: 5px;
 }

@@ -16,22 +16,21 @@
 $(document).ready(function() {
     var url = "/direct/sakai-oaai/";
 
-    $(".csv").click(function(){
-        if (this.id != "generate") {
-            getData(this.id, function(data) {
-                outputResponse(data);
-            });
-        } else {
-            generateNewData(this.id, function(data) {
-                outputResponse(data);
-            });
-        }
+    $(".csv").click(function() {
+        $("#action").val(this.id);
+        $("#downloadForm").submit();
     });
 
-    function getData(endpoint, callback) {
+    $("#generate").click(function() {
+        generateNewData(this.id, function(data) {
+            outputResponse(data);
+        });
+    });
+
+    /*function getData(endpoint, directory, callback) {
         var request = $.ajax({ 
             type: "GET",
-            url:  url + endpoint,
+            url:  url + endpoint + "/" + directory,
             data: {}
          });
 
@@ -42,7 +41,7 @@ $(document).ready(function() {
         request.error(function(jqXHR, textStatus, errorThrown) {
             callback("Request failed: " + textStatus + ", error : " + errorThrown);
         });
-    }
+    }*/
 
     function generateNewData(endpoint, callback) {
         var request = $.ajax({ 
@@ -61,6 +60,6 @@ $(document).ready(function() {
 
     // temp function for testing
     function outputResponse(data) {
-        $("#jsonResponse").html("Data: <br /><br>" + JSON.stringify(data, null, 2));
+        $("#jsonResponse").html(JSON.stringify(data, null, 2));
     }
 });

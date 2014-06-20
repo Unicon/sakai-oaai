@@ -29,16 +29,31 @@
 <div class="instructions clear">
     <spring:message code="oaai.instructions" />
 </div>
-
-<div>
-    <button class="btn btn-primary csv" id="courses"><spring:message code="oaai.button.courses" /></button>
-    <button class="btn btn-primary csv" id="grades"><spring:message code="oaai.button.grades" /></button>
-    <button class="btn btn-primary csv" id="students"><spring:message code="oaai.button.students" /></button>
-    <button class="btn btn-primary csv" id="usage"><spring:message code="oaai.button.usage" /></button>
-</div>
-<div class="generateButton">
-    <button class="btn btn-danger csv" id="generate"><spring:message code="oaai.button.generate" /></button>
-</div>
+<fieldset class="formFieldset">
+    <legend class="formLegend">Download a data report</legend>
+    <form id="downloadForm" method="post" action="download.htm">
+        <div class="selectDateRange">
+            <select id="csvDirectory" name="csvDirectory" class="form-control">
+                <c:forEach var="csvDirectory" items="${csvDirectories}">
+                    <option value="${csvDirectory.key}">${csvDirectory.value}</option>
+                </c:forEach>
+            </select>
+        </div>
+        <div>
+            <button class="btn btn-primary csv" id="courses"><spring:message code="oaai.button.courses" /></button>
+            <button class="btn btn-primary csv" id="grades"><spring:message code="oaai.button.grades" /></button>
+            <button class="btn btn-primary csv" id="students"><spring:message code="oaai.button.students" /></button>
+            <button class="btn btn-primary csv" id="usage"><spring:message code="oaai.button.usage" /></button>
+        </div>
+        <input type="hidden" id="action" name="action" value="" />
+    </form>
+</fieldset>
+<fieldset class="formFieldset">
+    <legend class="formLegend">Generate a new set of data reports</legend>
+    <div class="generateButton">
+        <button class="btn btn-danger" id="generate"><spring:message code="oaai.button.generate" /></button>
+    </div>
+</fieldset>
 <div id="jsonResponse"></div>
 
 </div>

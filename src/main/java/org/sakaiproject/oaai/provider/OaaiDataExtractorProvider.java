@@ -15,6 +15,7 @@
 
 package org.sakaiproject.oaai.provider;
 
+import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.entitybroker.EntityView;
@@ -105,7 +106,7 @@ public class OaaiDataExtractorProvider extends AbstractEntityProvider implements
             throw new SecurityException("User not allowed to access usage .csv.", null);
         }
 
-        return new ActionReturn(ENCODING_UTF8, Formats.JSON, "{}");
+        return new ActionReturn(ENCODING_UTF8, Formats.TXT, "");
     }
 
     /**

@@ -15,11 +15,20 @@
 package org.sakaiproject.oaai.dao;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +41,13 @@ public class Data extends Db {
 
     private static String CSV_FILE_USAGE = "usage.csv";
 
+    /**
+     * Create the usage.csv file, store it on file system
+     * 
+     * @param searchTerm the site title search term to use
+     * @param directory the name of the date-specific directory to store the .csv file
+     * @return true, if creation and storage successful
+     */
     public boolean prepareUsageCsv(String searchTerm, String directory) {
         String csvData = "";
         String sql = queries.getSqlEvents();
@@ -47,7 +63,13 @@ public class Data extends Db {
             ResultSetMetaData metadata = results.getMetaData();
             int numberOfColumns = metadata.getColumnCount();
 
-            // TODO add header row
+            // header row
+            List<String> header = new ArrayList<String>();
+            for (int i = 1;i <=numberOfColumns;i++) {
+                header.add(metadata.getColumnName(i));
+            }
+            csvData += csvService.setAsCsvRow(header);
+
             while (results.next()) {
                 List<String> row = new ArrayList<String>();
                 for (int i = 1;i <=numberOfColumns;i++) {
@@ -71,6 +93,33 @@ public class Data extends Db {
         boolean success = fileService.writeToCsvFile(csvFile, csvData);
 
         return success;
+    }
+
+    public String getCsvFile(String datedDirectory, String fileName) {
+        fileName += ".csv";
+        String csvData = fileService.readFileIntoString(datedDirectory, fileName);
+
+        return csvData;
+    }
+
+    public Map<String, String> getDirectoryListing() {
+        List<String> csvDirectoryNames = fileService.parseCsvDirectory();
+        Map<String, String> csvDirectories = new HashMap<String, String>(csvDirectoryNames.size());
+        SimpleDateFormat fileDate = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH);
+        SimpleDateFormat humanDate = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss", Locale.ENGLISH);
+
+        for (String csvDirectoryName : csvDirectoryNames) {
+            try {
+                Date date = fileDate.parse(csvDirectoryName);
+                String formattedDate = humanDate.format(date);
+                csvDirectories.put(csvDirectoryName, formattedDate);
+            } catch (Exception e) {
+                log.error("Error parsing directory name: " + e, e);
+                csvDirectories.put(csvDirectoryName, csvDirectoryName);
+            }
+        }
+
+        return csvDirectories;
     }
 
     private CsvService csvService;

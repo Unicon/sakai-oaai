@@ -16,6 +16,7 @@ package org.sakaiproject.oaai.service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -93,7 +94,7 @@ public class OaaiService {
 
     public String createDatedDirectoryName() {
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd_kkmmss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH);
         String directoryName = sdf.format(date);
 
         return directoryName;

@@ -20,14 +20,20 @@
 
     <!-- Sakai tool controllers -->
     <bean id="mainController" class="org.sakaiproject.oaai.controller.MainController">
+        <property name="data" ref="data" />
+    </bean>
+
+    <bean id="fileDownloadController" class="org.sakaiproject.oaai.controller.FileDownloadController">
+        <property name="data" ref="data" />
     </bean>
 
     <!-- Spring controller mappings -->
     <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="mappings">
-            <value>
-                /main.htm=mainController
-            </value>
+            <props>
+                <prop key="/main.htm">mainController</prop>
+                <prop key="/download.htm">fileDownloadController</prop>
+            </props>
         </property>
     </bean>
 
