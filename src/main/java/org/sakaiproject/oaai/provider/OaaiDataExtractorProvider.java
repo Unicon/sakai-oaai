@@ -15,9 +15,12 @@
 
 package org.sakaiproject.oaai.provider;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.sakaiproject.entitybroker.EntityView;
 import org.sakaiproject.entitybroker.entityprovider.EntityProvider;
 import org.sakaiproject.entitybroker.entityprovider.annotations.EntityCustomAction;
@@ -27,6 +30,7 @@ import org.sakaiproject.entitybroker.entityprovider.capabilities.Outputable;
 import org.sakaiproject.entitybroker.entityprovider.extension.ActionReturn;
 import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
 import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
+import org.sakaiproject.oaai.Constants;
 import org.sakaiproject.oaai.dao.Data;
 import org.sakaiproject.oaai.service.FileService;
 import org.sakaiproject.oaai.service.OaaiService;
@@ -116,19 +120,30 @@ public class OaaiDataExtractorProvider extends AbstractEntityProvider implements
      * @return
      */
     @EntityCustomAction(action="generate", viewKey=EntityView.VIEW_NEW)
-    public ActionReturn generateNewData(EntityView view) {
+    public ActionReturn generateNewData(EntityView view, Map<String, Object> params) {
         if (!oaaiService.isAdminSession()){
             throw new SecurityException("User not allowed to generate new CSVs.", null);
         }
 
-        String searchTerm = view.getPathSegment(2);
-        if (searchTerm == null) {
-            searchTerm = "";
+        String criteria = "";
+        if (params.get("criteria") != null) {
+            criteria = (String) params.get("criteria");
         }
+        /*String criteria = view.getPathSegment(2);
+        if (criteria == null) {
+            criteria = "";
+        } else {
+            try {
+                criteria = URLDecoder.decode(criteria, Constants.ENCODING_UTF8);
+            } catch (UnsupportedEncodingException e) {
+                log.error("Error decoding criteria: " + e, e);
+            }
+        }*/
+        
 
         String directory = fileService.createDatedDirectoryName();
 
-        boolean usageCsvCreated = data.prepareUsageCsv(searchTerm, directory);
+        boolean usageCsvCreated = data.prepareUsageCsv(criteria, directory);
 
         return new ActionReturn(ENCODING_UTF8, Formats.TXT, "Usage CSV created successfully: " + Boolean.toString(usageCsvCreated));
     }

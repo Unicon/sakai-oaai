@@ -25,4 +25,6 @@ public class Constants {
     public final static String DATE_FORMAT_DROPDOWN = "MMMM dd, yyyy HH:mm:ss";
 
     public final static String MIME_TYPE_CSV = "text/csv";
+
+    public final static String ENCODING_UTF8 = "UTF-8";
 }

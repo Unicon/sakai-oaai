@@ -22,7 +22,8 @@ $(document).ready(function() {
     });
 
     $("#generate").click(function() {
-        generateNewData(this.id, function(data) {
+        var criteria = $("#criteria").serialize();
+        generateNewData(this.id, criteria, function(data) {
             outputResponse(data);
         });
     });
@@ -43,10 +44,12 @@ $(document).ready(function() {
         });
     }*/
 
-    function generateNewData(endpoint, callback) {
+    function generateNewData(endpoint, criteria, callback) {
+        console.log(criteria);
         var request = $.ajax({ 
             type: "POST",
-            url:  url + endpoint
+            url:  url + endpoint,
+            data: criteria
          });
 
         request.success(function(data, status, jqXHR) {

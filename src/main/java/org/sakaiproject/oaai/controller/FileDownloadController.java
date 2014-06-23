@@ -32,10 +32,10 @@ public class FileDownloadController {
 
     @RequestMapping(method = RequestMethod.POST)
     public void doDownload(HttpServletRequest request, HttpServletResponse response) {
-        String datedDirectory = request.getParameter("csvDirectory");
+        String datedDirectory = request.getParameter("directory");
         String action = request.getParameter("action");
         String fileName = action + ".csv";
-        String csvData = data.getCsvData(datedDirectory, action);
+        String csvData = data.getCsvData(datedDirectory, fileName);
 
         response.setContentType(Constants.MIME_TYPE_CSV);
         response.setHeader("Content-Disposition", "attachment; filename='"+ fileName + "'");

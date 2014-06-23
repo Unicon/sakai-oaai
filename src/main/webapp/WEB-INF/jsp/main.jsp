@@ -50,7 +50,11 @@
 </fieldset>
 <fieldset class="formFieldset">
     <legend class="formLegend">Generate a new set of data reports</legend>
-    <div class="generateButton">
+    <div class="generate">
+        <label for="criteria"><spring:message code="oaai.label.criteria" /></label>
+        <input type="text" id="criteria" name="criteria" value="" placeholder="use '%' for a wildcard" />
+    </div>
+    <div class="generate">
         <button class="btn btn-danger" id="generate"><spring:message code="oaai.button.generate" /></button>
     </div>
 </fieldset>
